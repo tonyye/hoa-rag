@@ -1,0 +1,11 @@
+llama-index-core~=0.14.13
+llama-index-embeddings-ollama
+llama-index-graph-stores-neo4j
+llama-index-llms-ollama
+python-dotenv~=1.2.1
+streamlit~=1.54.0
+nest-asyncio~=1.6.0
+
+pathlib~=1.0.1
+click~=8.3.1
+pydantic~=2.12.5
