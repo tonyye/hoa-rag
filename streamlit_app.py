@@ -143,14 +143,16 @@ def get_query_engine(config, index):
         llm=llm,
         include_text=True,
         similarity_top_k=10,
+        include_metadata=True,
     )
 
 
 def main():
-    st.set_page_config(page_title="Property Graph Index Query", layout="wide")
+    tittle = "Woodcrest Hills Chatbot"
+    st.set_page_config(page_title=tittle, layout="wide")
 
-    st.title("Property Graph Index Query")
-    st.markdown("Ask questions about your documents using a property graph index.")
+    st.title(tittle)
+    st.markdown("Ask questions about the Woodcrest Hills HOA.")
 
     # Initialize session state
     if "config" not in st.session_state:
@@ -287,9 +289,15 @@ def handle_chat(prompt, config):
 
                 # Show sources if available
                 if hasattr(response, "source_nodes") and response.source_nodes:
-                    with st.expander("Show sources"):
+                    with st.expander("Show reference documents"):
+                        reference_documents = set()
                         for i, node in enumerate(response.source_nodes, 1):
-                            st.markdown(f"**Source {i}:** {node.text[:500]}...")
+                            document = node.metadata["file_name"]
+                            if document not in reference_documents:
+                                st.markdown(f"**Document:** {document}...")
+                                if "document_title" in node.metadata:
+                                    st.markdown(node.metadata["document_title"])
+                                reference_documents.add(document)
 
             except Exception as e:
                 st.error(f"Error: {e}")

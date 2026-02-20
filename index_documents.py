@@ -17,6 +17,7 @@ from llama_index.core import (
     SimpleDirectoryReader,
     Settings,
 )
+from llama_index.core.extractors import TitleExtractor, QuestionsAnsweredExtractor
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.graph_stores.neo4j import Neo4jPropertyGraphStore
 from llama_index.llms.ollama import Ollama
@@ -105,7 +106,9 @@ def create_or_load_index(document_path: str, config: dict):
         embed_model=embed_model,
         llm=llm,
         transformations=[
-            WoodcrestHillsDocumentParser(llm=llm, embed_model=embed_model)
+            TitleExtractor(),
+            WoodcrestHillsDocumentParser(llm=llm, embed_model=embed_model),
+            QuestionsAnsweredExtractor(),
         ],
         use_async=False,
     )

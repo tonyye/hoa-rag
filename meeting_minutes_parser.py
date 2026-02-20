@@ -60,23 +60,38 @@ class MeetingMinutesParser(NodeParser):
         items = ["board_members_present", "also_present", "board_members_absent", "next_meeting_date", "submitted_by"]
         list_items = ["homeowner_forum", "business_items_architectural", "minutes",
                       "financials", "delinquency_violations", "other_business"]
+        metadata = document.metadata | {
+            "meeting_date": meeting_date
+        }
         nodes = [
-            TextNode(text=f"{meeting_minutes.title} was held on {meeting_date} from {meeting_minutes.call_to_order_time} to {meeting_minutes.adjournment_time}"),
-            TextNode(text=f"{meeting_minutes.title} was held at {meeting_minutes.location}"),
+            TextNode(
+                text=f"{meeting_minutes.title} was held on {meeting_date} from {meeting_minutes.call_to_order_time} to {meeting_minutes.adjournment_time}",
+                metadata=metadata,
+            ),
+            TextNode(
+                text=f"{meeting_minutes.title} was held at {meeting_minutes.location}",
+                metadata=metadata,
+            ),
         ]
         for item in items:
             nodes.append(
-                TextNode(text=f"""
+                TextNode(
+                    text=f"""
                         {MeetingMinutes.model_fields[item].description} on {meeting_date}:
                         {meeting_minutes_dict[item]}
-                    """)
+                    """,
+                    metadata=metadata,
+                )
             )
         for list_item in list_items:
             nodes.extend([
-                TextNode(text=f"""
-                    {MeetingMinutes.model_fields[list_item].description} on {meeting_date}:
-                    {item}
-            """) for item in meeting_minutes_dict[list_item]
+                TextNode(
+                    text=f"""
+                        {MeetingMinutes.model_fields[list_item].description} on {meeting_date}:
+                        {item}
+                    """,
+                    metadata=metadata
+                ) for item in meeting_minutes_dict[list_item]
             ])
 
         return nodes
