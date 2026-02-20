@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence, Any, List
 
 from llama_index.core.base.embeddings.base import BaseEmbedding
@@ -9,6 +10,9 @@ from llama_index.core.utils import get_tqdm_iterable
 from pydantic import SerializeAsAny
 
 from meeting_minutes_parser import MeetingMinutesParser
+
+
+logger = logging.getLogger(__name__)
 
 
 class WoodcrestHillsDocumentParser(NodeParser):
@@ -25,6 +29,7 @@ class WoodcrestHillsDocumentParser(NodeParser):
         semantic_splitter_node_parser = SemanticSplitterNodeParser(embed_model=self.embed_model)
         nodes_with_progress = get_tqdm_iterable(nodes, show_progress, "Parsing nodes")
         for node in nodes_with_progress:
+            logger.info(f"Parsing {node.metadata['file_path']}")
             all_nodes.extend(
                 meeting_node_parser.get_nodes_from_documents(
                     [node], show_progress, **kwargs) if self.is_meeting_minutes_document(node)
