@@ -11,6 +11,7 @@ If no query is provided, enters interactive chat mode.
 import os
 import sys
 
+import nest_asyncio
 from dotenv import load_dotenv
 from llama_index.core import (
     PropertyGraphIndex,
@@ -28,6 +29,7 @@ from woodcrest_hills_document_parser import WoodcrestHillsDocumentParser
 # Load environment variables from .env file
 load_dotenv()
 
+nest_asyncio.apply()
 
 def create_graph_store(config):
     """Create a Neo4j property graph store."""
@@ -112,10 +114,9 @@ def create_or_load_index(document_path: str, config: dict):
         ],
         use_async=False,
     )
+    graph_store.close()
 
     print("Index created and stored in Neo4j.")
-
-    return index
 
 
 def query_mode(index, config):
@@ -220,15 +221,7 @@ def main():
         print("\nPlease set the required environment variables in your .env file.")
         sys.exit(1)
 
-    index = create_or_load_index(document_path, config)
-
-    if len(sys.argv) > 2:
-        # Single query mode
-        query = " ".join(sys.argv[2:])
-        single_query(index, query, config)
-    else:
-        # Interactive mode
-        query_mode(index, config)
+    create_or_load_index(document_path, config)
 
 
 if __name__ == "__main__":
